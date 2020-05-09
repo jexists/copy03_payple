@@ -1,0 +1,173 @@
+/*
+ * TO CONTRACT
+ * registerForm
+ */
+
+$(document).ready( function () {
+
+	var reg_exp_0 = function (val) {
+		result = val.replace(/([^0-9]+)/g, '');
+		return result;
+	};
+	
+	var reg_exp_hp = function (val) {
+		result = val.replace(/([^0-9\-]+)/g, '');
+		return result;
+	};
+	
+	/*
+	 * manager_hp : 숫자, - 만 사용 가능
+	 */
+	$('#manager_hp').on({
+		'keyup' : function (e) {
+
+			var manager_hp_val = reg_exp_hp($(this).val());
+
+			if (manager_hp_val != '' && reg_exp_0($(this).val()) == '') {
+
+				alert('휴대폰 번호를 바르게 입력하세요!!');
+
+				$(this).val('');
+
+				return false;
+			}
+
+			$(this).val(manager_hp_val);
+			
+		}, 'mousemove' : function (e) {
+
+			var manager_hp_val = reg_exp_hp($(this).val());
+
+			if (manager_hp_val != '' && reg_exp_0($(this).val()) == '') {
+
+				alert('휴대폰 번호를 바르게 입력하세요!!');
+
+				$(this).val('');
+
+				return false;
+			}
+
+			$(this).val(manager_hp_val);
+		}
+	});
+	
+	// registerForm
+	$('#contractSend').on('click', function (event) {
+
+			event.preventDefault();
+			
+			var com_name = $('#com_name').val();
+			var com_website = $('#com_website').val();
+			var com_type = $('#com_type').val();
+			var com_goods = $('#com_goods').val();
+			var manager_name = $('#manager_name').val();
+			var manager_hp = $('#manager_hp').val();
+			var manager_email = $('#manager_email').val();
+
+			if (com_name == '') {
+				alert('상호명을 입력하세요!');
+				$('#com_name').focus();
+				return false;
+			}
+
+			if (com_website == '') {
+				alert('결제를 도입할 웹사이트를 입력하세요!');
+				$('#com_website').focus();
+				return false;
+			}
+			
+			if (com_type == '') {
+				alert('사업자종류를 선택하세요!');
+				$('#com_website').focus();
+				return false;
+			}
+
+			if (com_goods == '') {
+				alert('주요 판매상품을 입력하세요!');
+				$('#com_goods').focus();
+				return false;
+			}
+
+			if (manager_name == '') {
+				alert('담당자 이름을 입력하세요!');
+				$('#manager_name').focus();
+				return false;
+			}
+
+			if (manager_hp == '') {
+				alert('담당자 휴대폰 번호를 입력하세요!');
+				$('#manager_hp').focus();
+				return false;
+			}
+
+			if (manager_email == '') {
+				alert('담당자 Email 을 입력하세요!');
+				$('#manager_email').focus();
+				return false;
+			}
+
+			$('#contractSend').attr('disabled', true);
+
+			var formData = new FormData($('#contractForm')[0]);
+			
+			$.ajax({
+				type: 'POST',
+				cache: false,
+				processData: false,
+				url: '/controller/contract/contractAction.php',
+				contentType: false,
+				async: false,
+				dataType: 'json',
+				data: formData,
+				success: function (data) {
+					
+					AjaxSuccessConsoleLog(data);
+					
+					if (data.result == 'success') {
+						
+						alert(' 서비스 가입신청이 완료되었습니다. \n\n 담당자가 지정되는대로 연락드리겠습니다. \n\n 감사합니다. \n\n');
+
+						$('#contractForm')[0].reset();
+						$('#contractCalcel').trigger('click');
+						$('#contractSend').attr('disabled', false);
+						
+						// Google ads
+						// Event snippet for 가입문의 완료 conversion page In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button.					
+						gtag_report_conversion('https://www.payple.kr');
+						
+						// Facebook
+						fbq('track', 'Lead');
+						
+						// Kakao ads
+					    //kakaoPixel('27555958655238500').pageView();
+					    kakaoPixel('27555958655238500').completeRegistration();
+						
+						// naver
+//						var _nasa={};
+//						_nasa["cnv"] = wcs.cnv("1","2");
+						
+					} else {
+						
+						alert(data.result + ' : ' + data.result_msg);
+						
+						$('#contractSend').attr('disabled', false);
+						
+						return false;
+					}
+					
+				},
+				error: function (jqxhr, status, error) {
+					
+					AjaxErrorConsoleLog(jqxhr, status, error);
+					
+					$('#contractSend').attr('disabled', false);
+					
+					return false;
+				}
+				
+			});			
+		
+		
+	});
+	
+});

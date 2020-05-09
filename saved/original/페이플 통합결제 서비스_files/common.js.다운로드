@@ -1,0 +1,171 @@
+/**
+ * COMMON UTIL
+ */
+function Number_check(sel){
+	var val = sel.value;
+		val = val.replace(/\D/g,'');
+		
+		sel.value = val;
+}
+
+function Number_check2(sel){
+  var val = sel.value;
+	  val = val.replace(/\D/g,'');
+	  val = number_format(val);
+
+	  sel.value = val;
+}
+
+function number_format(num) {
+  
+  var num = num.replace(/\D/g, '');
+  var num_str = num.toString();
+  var result = '';
+
+  for(var i=0; i<num_str.length; i++) {
+    var tmp = num_str.length-(i+1);
+    if(i%3==0 && i!=0) result = ',' + result;
+    result = num_str.charAt(tmp) + result;
+  }
+  
+  return result;
+}
+
+var remote_addr = "";
+var authok = "";
+
+// 현재의 접속 IP 확인
+var getIpAuthCheck = function () {
+			
+			var formData = new FormData();
+	
+			$.ajax({
+				type : 'POST',
+				cacha : false,
+				processData : false,
+				contentType : false,
+				url : '/payple/admin/controller/cert/IpAuthCheck.php',
+				async : false,
+				dataType : 'json',
+				data : formData,
+				success : function (data) {
+					
+//					console.log(data);
+					
+					if (data.result == 'success') {
+
+						remote_addr = data.remote_addr;
+						authok = data.authok;							
+						
+					}
+					
+				},
+				error : function (jqxhr, status, error) {
+					
+//					console.log(jqxhr);
+//					
+//				    alert(jqxhr.statusText + ",  " + status + ",   " + error);
+//				    alert(jqxhr.status);
+//				    alert(jqxhr.responseText);
+				    
+				}
+				
+			});
+	
+};
+
+
+/* ############################################################## */
+getIpAuthCheck();  //IP 정보 및 IPAUTH 실행
+/* ############################################################## */
+
+
+var AjaxSuccessConsoleLog = function (data) {
+	
+	if (authok == 'Y') {
+			
+			console.log(data);
+
+	}
+	
+};
+
+var AjaxErrorConsoleLog = function (jqxhr, status, error) {
+	
+	if (authok == 'Y') {
+	
+		console.log(jqxhr);
+		
+	    alert(jqxhr.statusText + ",  " + status + ",   " + error);
+	    alert(jqxhr.status);
+	    alert(jqxhr.responseText);
+		
+	}
+	
+};
+
+var isEmpty = function (value) {
+	
+	if (value == "" || value == null || value == undefined || (value != null && typeof value == "object" && !Object.keys(value).length)) {
+		
+		return true;
+	
+	} else {
+		
+		return false;
+		
+	}
+	
+};
+
+$(function() {
+	
+	$("a").on('click', function (e) {
+		e.preventDefault();
+		
+		var url = $(this).prop('href');
+		var target = $(this).prop('target');
+		
+		if (target.indexOf('blank') != -1 || target.indexOf('new') != -1) {
+			
+			window.open(url);
+			
+		} else if (url != '' && url.indexOf('#') == -1) {
+
+			$(".loader").show();
+			
+			setTimeout(function () {
+				window.location = url
+			}, 500);
+		}
+		
+	});
+	
+});
+
+
+//$(window).on(function () {
+//    $(".loader").fadeOut("slow");
+//});
+//
+//! function (a)
+//{   
+//      jQuery(window).bind("unload", function () { }), a(document).ready(function () {
+//          a(".loader").hide(), a("form").on("submit", function () {
+//              a("form").validate(), a("form").valid() ? (a(".loader").show(), a("form").valid() || a(".loader").hide()) : a(".loader").hide()
+//          }), a('a:not([href^="#"])').on("click", function () {
+//              "" != a(this).attr("href") && a(".loader").show(), a(this).is('[href*="Download"]') && a(".loader").hide()
+//          }), a("a:not([href])").click(function () {
+//              a(".loader").hide()
+//          }), a('a[href*="javascript:void(0)"]').click(function () {
+//              a(".loader").hide()
+//          }), a(".export").click(function () {
+//              setTimeout(function () {
+//                  a(".loader").fadeOut("fast")
+//              }, 1e3)
+//          })
+//      })
+//}(jQuery);
+
+
+
